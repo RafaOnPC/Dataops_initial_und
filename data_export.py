@@ -7,21 +7,27 @@ def exportar_datos(df):
 
     archivo_global = os.path.join('output', 'Fich_Des_Und_GLOBAL.xlsx')
 
-    # Agrupacion de archivos por unidad
+    # Agrupacion de dataframes por unidad
     for unidad, df_unidad in df.groupby('unidad'):
         unidad_archivo = unidad.replace(' ', '_')
         archivo_excel = os.path.join('output', f'Fich_Des_{unidad_archivo}.xlsx')
+        # Eliminacion de columna archivo_origen
+        df_export = df_unidad.drop(columns=['archivo_origen'], errors='ignore')
         #Generacion de archivo por unidad
-        df_unidad.to_excel(archivo_excel, index=False)
+        df_export.to_excel(archivo_excel, index=False)
         print(f'Archivo generado: {archivo_excel}')
 
     # Archivo global historico
+    df_nuevo = df.drop(columns=['archivo_origen'], errors='ignore')
+    
     if os.path.exists(archivo_global):
         df_global = pd.read_excel(archivo_global, dtype=str)
-        df_global = pd.concat([df_global, df], ignore_index=True)
+        # Eliminacion de columna
+        df_global = df_global.drop(columns=['archivo_origen'], errors='ignore')
+        df_global = pd.concat([df_global, df_nuevo], ignore_index=True)
         print('Archivo global existente actualizado')
     else:
-        df_global = df.copy()
+        df_global = df_nuevo.copy()
         print('Archivo global creado')
 
     df_global.to_excel(archivo_global, index=False)
