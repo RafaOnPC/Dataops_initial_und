@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+import os
 
 def transformar_datos(df):
     # 0. ELIMINAR DUPLICADOS
@@ -14,7 +15,20 @@ def transformar_datos(df):
 
     # 2. Unidad → valor estándar "unidad 1"
    
-    df.loc[:, 'unidad'] = 'Unidad 1'
+    def extraer_unidad(nombre_archivo):
+    
+        nombre_archivo = nombre_archivo.lower()
+
+        if 'unidad_' in nombre_archivo:
+            try:
+                numero = nombre_archivo.split('unidad_')[1].split('_')[0]
+                return f'Unidad {int(numero)}'
+            except:
+                return 'Unidad Desconocida'
+
+        return 'Unidad Desconocida'
+
+    df['unidad'] = df['archivo_origen'].apply(extraer_unidad)
 
     # 3. Normalizar entrega
     def normalizar_entrega(valor):
@@ -82,3 +96,12 @@ def transformar_datos(df):
 
     return df
 
+if __name__ == "__main__":
+    entrada = os.path.join('output', 'read_output.csv')
+    salida = os.path.join('output', 'transform_output.csv')
+
+    df = pd.read_csv(entrada, dtype=str)
+    df = transformar_datos(df)
+
+    df.to_csv(salida, index=False)
+    print(f'Datos TRANSFORM guardados en: {salida}')

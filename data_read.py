@@ -19,3 +19,12 @@ def cargar_datos():
 
     df_final = pd.concat(lista_df, ignore_index=True)
     return df_final
+
+if __name__ == "__main__":
+    os.makedirs('output', exist_ok=True)
+
+    df = cargar_datos()
+    salida = os.path.join('output', 'read_output.csv')
+    df.to_csv(salida, index=False)
+
+    print(f'Datos READ guardados en: {salida}')
